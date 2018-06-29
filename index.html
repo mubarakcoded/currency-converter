@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="stylesheet" type="text/css" href="./css/bootstrap.css"/>
+		<link rel="stylesheet" type="text/css" href="./css/style.css"/>
+		<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1"/>
+	</head>
+<body>
+  
+	<div class="col-md-3"></div>
+	<div class="col-md-6 well">
+		<h3 class="text-primary void">Currency Converter</h3>
+		<hr style="border-top:1px dotted #ccc;">
+		<div class="col-md-2"></div>
+		<div class="col-md-8">
+			<div class="form-group">
+				
+				<select class="form-control" id="from" style="width:100%;">
+					<option value="">-- Select --</option>
+				</select>
+				<h3 class="text-primary">Convert to</h1>
+				<select class="form-control" id="to" style="width:100%;">
+						<option value="">-- Select --</option>
+
+					</select>
+
+			</div>
+			
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Amount" name="amount" id="amount">
+						<span class="input-group-btn">
+							<button class="btn btn-primary" type="button" id="convert">Convert</button>
+						</span>
+					</div><!-- /input-group -->
+			<br />
+			<label>Converted Value</label>
+			<div class="input-group">
+					<span class="input-group-addon">$</span>
+					<input type="text" class="form-control" id="converted" value="" aria-label="Amount (to the nearest dollar)" disabled="disabled">
+					
+				</div>
+			
+		</div>
+	</div>
+	
+
+
+	<!-- Register Service Worker -->
+<script src="js/main.js"></script>
+<script src="js/index.js"></script>
+
+
+</body>
+
+
+
+<!-- Storing currencies in database 
+<script>
+//	import idb from 'idb';
+	const apiURL = `https://free.currencyconverterapi.com/api/v5/countries`;   
+let countriesCurrencies;
+const dbPromise = idb.open('countries-currencies', 0, upgradeDB => {
+  // Note: we don't use 'break' in this switch statement,
+  // the fall-through behaviour is what we want.
+  switch (upgradeDB.oldVersion) {
+    case 0:
+      upgradeDB.createObjectStore('objs', {keyPath: 'id'});
+  }
+});
+fetch(apiURL)
+  .then(function(response) {
+  return response.json();
+})
+  .then(function(currencies) {
+  dbPromise.then(db => {
+    if(!db) return;
+    countriesCurrencies = [currencies.results];
+    const tx = db.transaction('objs', 'readwrite');
+    const store = tx.objectStore('objs');
+    let i = 0;
+    countriesCurrencies.forEach(function(currency) {
+      for (let value in currency) {
+        store.put(currency[value]);
+      }
+    });
+    return tx.complete;
+  });
+});
+</script> -->
+
+</html>
