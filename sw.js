@@ -1,10 +1,5 @@
 
-const staticCacheName = 'currency-converter-v1';
-const apiCache = 'currency-api-v1';
-var allCaches = [
-  staticCacheName,
-  apiCache
-];
+var staticCacheName = 'currency-converter-v1';
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
@@ -21,51 +16,46 @@ self.addEventListener('install', function(event) {
   );
 });
 
-self.addEventListener('activate', function(event) {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(function(cacheNames) {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.filter(function(cacheName) {
-          return cacheName.startsWith('currency-') &&
-                 !allCaches.includes(cacheName);
-        }).map(function(cacheName) {
-          return caches.delete(cacheName);
-        })
+        cacheNames.filter((cacheName) => {
+          return cacheName.startsWith('currency-converter-') &&
+            cacheName !== staticCacheName;
+        }).map(cacheName => caches.delete(cacheName))
       );
     })
   );
 });
 
-self.addEventListener('fetch', function(event) {
-  apiUrl = 'https://free.currencyconverterapi.com/api/v5/currencies';
-    // If there is network available
-    if (event.request.url.indexOf(apiUrl) === 0) {
-      event.respondWith(
-        fetch(event.request).then(response =>
-          caches.open(apiCache).then(cache => {
-            cache.put(event.request.url, response.clone());
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        if (response) {
+          return response;
+        }
+        const fetchRequest = event.request.clone();
+
+        return fetch(fetchRequest).then(
+          (response) => {
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+            const responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache);
+              });
+            
             return response;
-          }),
-        ),
-      );
-    }
-    else{
-      // event.respondWith(
-      //   caches.match(event.request).then(function(response) {
-      //     return response || fetch(event.request);
-      //   })
-      // );
-      event.respondWith(
-        caches
-          .match(event.request)
-          .then(response => response || fetch(event.request)),
-      
-
-      );
-
-    }
-
-  
+          }
+        )
+      })
+  )
 });
 
 self.addEventListener('message', function(event) {
