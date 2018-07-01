@@ -6,7 +6,7 @@ if (!window.indexedDB) {
 }
 
 const apiURL = `https://free.currencyconverterapi.com/api/v5/countries`;   
-const storeName = 'currency-converter-store';
+const storeName = 'savedCurrencies';
 let dbName='currency-converter';
 let version=1;
 
@@ -22,7 +22,7 @@ request.onsuccess = function(event) {
 
 request.onupgradeneeded = function(event) {
   var db = event.target.result;
-  var objectStore = db.createObjectStore(storeName, {keyPath: "id"});
+  var objectStore = db.createObjectStore(storeName);
 
   fetch(apiURL).then((response) => response.json()).then(function(currencies) {
         if(!db) return;

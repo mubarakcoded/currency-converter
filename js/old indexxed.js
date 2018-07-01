@@ -6,7 +6,7 @@ if (!window.indexedDB) {
 }
 
 const apiURL = `https://free.currencyconverterapi.com/api/v5/countries`;   
-const storeName = 'currency-converter-store';
+const storeName = 'currencies';
 let dbName='currency-converter';
 let version=1;
 

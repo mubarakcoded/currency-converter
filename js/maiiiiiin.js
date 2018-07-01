@@ -22,41 +22,13 @@ if ('serviceWorker' in navigator) {
     
     getData();
   });
-
-  //  function getData() {
-  //   fetch(apiUrl).then((response) => response.json()).then(function(dataJson) {
-
-  //      // const currencies = Object.keys(dataJson.results).sort();
-  //      const allCurrenciesArray = dataJson.results;
-
-  //      console.log(dataJson.results);
-  //      // Save all currencies to IndexedDB for offline use
-
-  //      // Save currency list to IndexedDB to be used when the user is offline
-  //      IndexedDatabase.saveAllCurrencies('allCurrencies', allCurrenciesArray);
-  //      populateSelect(allCurrenciesArray)
- 
-  //    }).catch(function(error) {
-  //      console.log(error);
-  //    });
-  //    // Get currency exchange rate when the user is offline
-  //    IndexedDatabase.getAll('allCurrencies').then(allCurrenciesArray => {
-  //      if (typeof allCurrenciesArray === 'undefined') return;
-  //      populateSelect(allCurrenciesArray);
-  //    });
-  // }
   function getData() {
-    const url = 'https://free.currencyconverterapi.com/api/v5/currencies';
 
-    fetch(url, {
-      cache: 'default',
-    })
-      .then(res => res.json())
-      .then(dataJson => {
-      
-       const allCurrenciesArray = dataJson.results;
+    // This will fetch the data from the API if we don't have a cached version
+    fetch(apiUrl).then((response) => response.json()).then(function(dataJson) {
+      const allCurrenciesArray = dataJson.results;
 
-        //Save currency list to IndexedDB to be used when the user is offline
+      // Save currency list to IndexedDB to be used when the user is offline
        IndexedDatabase.saveAllCurrencies('allCurrencies', allCurrenciesArray);
        populateSelect(allCurrenciesArray);
       })
@@ -71,6 +43,29 @@ if ('serviceWorker' in navigator) {
         });
       });
   }
+  //  function getData() {
+  //   fetch(url).then((response) => response.json()).then(function(dataJson) {
+
+  //       // const currencies = Object.keys(dataJson.results).sort();
+  //       const allCurrenciesArray = dataJson.results;
+
+  //       console.log(dataJson.results);
+  //       // Save all currencies to IndexedDB for offline use
+
+  //       // Save currency list to IndexedDB to be used when the user is offline
+  //       IndexedDatabase.saveAllCurrencies('allCurrencies', allCurrenciesArray);
+  //       populateSelect(allCurrenciesArray)
+  
+  //     }).catch(function(error) {
+  //       console.log(error);
+  //     );
+  //     // Get currency exchange rate when the user is offline
+  //     IndexedDatabase.getAll('allCurrencies').then(allCurrenciesArray => {
+  //       if (typeof allCurrenciesArray === 'undefined') return;
+  //       populateSelect(allCurrenciesArray);
+  //     });
+      
+  //  }
 
   document.getElementById('convert').addEventListener('click', function() {
     let from = document.getElementById('from');
@@ -102,7 +97,7 @@ if ('serviceWorker' in navigator) {
 }
 
 function ConvertQuery(curr1, curr2) {
-    if (arguments.length !== 2) {
+  if (arguments.length !== 2) {
     return 'You need to specify both arguments for the URL to be built correctly.';
   }
   const currencyUrl = `https://free.currencyconverterapi.com/api/v5/convert?q=${curr1}_${curr2}&compact=ultra`;
