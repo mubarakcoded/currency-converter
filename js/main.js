@@ -173,7 +173,7 @@
       })
       .catch(error =>
         console.error(
-          `An error had occured while getting the conversion rate. ${error}`,
+          `An error had occured. ${error}`,
         ),
       );
       // Get currency exchange rate when the user is offline fron IndexedDB
