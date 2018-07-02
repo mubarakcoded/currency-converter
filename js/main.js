@@ -1,6 +1,5 @@
-import IndexedDatabase from './idb.js';
-
-
+//checking if browser support service worker
+//Register a service worker hosted at the root of the
 if ('serviceWorker' in navigator) {
     // Register a service worker hosted at the root of the
     // site using the default scope.
@@ -12,63 +11,105 @@ if ('serviceWorker' in navigator) {
   } else {
     console.log('Service workers are not supported.');
   }
+//checking if browser support indexedDB
+  if (!window.indexedDB) {
+    window.alert("Your browser doesn't support a stable version of IndexedDB.")
+  }
+  
+  var db;
+  const dbName = ' currency-converter';
+  const storeName = 'currencies';
+  const request = window.indexedDB.open(dbName, 1)
+  
+  
+  request.onerror = function(event) {
+    alert("an error had occured");
+  };
+  request.onsuccess = function(event) {
+    console.log(dbName, 'IndexedDB opened');
+    // db = event.target.result;
+    // db = request.result;
+    db = request.result;
+    console.log("success: "+ db);
+  };
+  request.onupgradeneeded = function(event) {
+    const db = event.target.result;
+    const objectStore = db.createObjectStore(storeName);
+    console.log("Object Store created", storeName );
+  }
+  
+  function saveAllCurrencies(key, allCurrencies) {
+    const transaction = db.transaction(storeName, "readwrite");
+    const store = transaction.objectStore(storeName);
+    store.put(allCurrencies, key);
+    request.onerror = (event) => reject(event.error);
+    request.onsuccess = (event) => resolve(event.target.result);
+  }
 
+  function saveRates(key, currencies) {
+    const transaction = db.transaction(storeName, "readwrite");
+    const store = transaction.objectStore(storeName);
+    currencies.forEach(currency => store.put(currency, key));
+    request.onerror = (event) => reject(event.error);
+    request.onsuccess = (event) => resolve(event.target.result);
+  }
+
+  function getCurrencies(key) {
+    var transaction = db.transaction(storeName);
+    var objectStore = transaction.objectStore(storeName);
+    var request = objectStore.get(key);
+    let allCurrencies;
+    request.onerror = function(event) {
+       alert("Unable to retrieve data from database!");
+    };
+    request.onsuccess = function(event) {
+    allCurrencies = request.result;
+    //populate the select box for offline conversion
+    populateSelect(allCurrencies);
+};
+    
+}
+function getRates(key) {
+  var transaction = db.transaction(storeName);
+  var objectStore = transaction.objectStore(storeName);
+  var request = objectStore.get(key);
+  request.onerror = function(event) {
+     alert("Unable to retrieve data from database!");
+  };
+  request.onsuccess = function(event) {
+  const currencyRate = request.result;
+  const inputAmount = getAmount();
+  calculateExchangeRate(currencyRate, inputAmount);
+
+ console.log(currencyRate);
+  //populate the select box for offline conversion
+};
+  
+}
   const apiUrl = 'https://free.currencyconverterapi.com/api/v5/currencies';
   let query;
 
 
 
   window.addEventListener('load', function() {
-    
     getData();
   });
-
-  //  function getData() {
-  //   fetch(apiUrl).then((response) => response.json()).then(function(dataJson) {
-
-  //      // const currencies = Object.keys(dataJson.results).sort();
-  //      const allCurrenciesArray = dataJson.results;
-
-  //      console.log(dataJson.results);
-  //      // Save all currencies to IndexedDB for offline use
-
-  //      // Save currency list to IndexedDB to be used when the user is offline
-  //      IndexedDatabase.saveAllCurrencies('allCurrencies', allCurrenciesArray);
-  //      populateSelect(allCurrenciesArray)
- 
-  //    }).catch(function(error) {
-  //      console.log(error);
-  //    });
-  //    // Get currency exchange rate when the user is offline
-  //    IndexedDatabase.getAll('allCurrencies').then(allCurrenciesArray => {
-  //      if (typeof allCurrenciesArray === 'undefined') return;
-  //      populateSelect(allCurrenciesArray);
-  //    });
-  // }
   function getData() {
     const url = 'https://free.currencyconverterapi.com/api/v5/currencies';
 
-    fetch(url, {
-      cache: 'default',
-    })
-      .then(res => res.json())
-      .then(dataJson => {
-      
+    fetch(url).then(res => res.json()).then(dataJson => {
        const allCurrenciesArray = dataJson.results;
-
         //Save currency list to IndexedDB to be used when the user is offline
-       IndexedDatabase.saveAllCurrencies('allCurrencies', allCurrenciesArray);
+       saveAllCurrencies('allCurrencies', allCurrenciesArray);
+        // populate the data to the selectbox
        populateSelect(allCurrenciesArray);
       })
       .catch(err => {
         console.error(
           `The following error occured while trying to get the list of currencies. ${err}`,
         );
-        // Get currency exchange rate when the user is offline
-        IndexedDatabase.getAll('allCurrencies').then(allCurrenciesArray => {
-          if (typeof allCurrenciesArray === 'undefined') return;
-          populateSelect(allCurrenciesArray);
-        });
+        // Get all currencies when the user is offline
+        getCurrencies('allCurrencies');
       });
   }
 
@@ -82,13 +123,12 @@ if ('serviceWorker' in navigator) {
     const url = ConvertQuery(val1, val2);
     fetchCurrencyRate(url, query);
   });
-
+  
   function populateSelect(values){
-
-    let ele = document.getElementById('from');
+    let ele1 = document.getElementById('from');
     let ele2 = document.getElementById('to');
     for (const data in values) {
-      ele.innerHTML = ele.innerHTML +
+      ele1.innerHTML = ele1.innerHTML +
             '<option value="' + values[data].id + '"> ' + values[data].id + ' | ' + values[data].currencyName + '</option>';
             ele2.innerHTML = ele2.innerHTML +
             '<option value="' + values[data].id + '"> ' + values[data].id + ' | ' + values[data].currencyName + '</option>';
@@ -119,7 +159,7 @@ function fetchCurrencyRate(url, query) {
   
        // Save currency exchange rate to IndexedDB to be used when the user is offline
        console.log(query, exchangeRate);
-      IndexedDatabase.saveRates(query, exchangeRate);
+      saveRates(query, exchangeRate);
       calculateExchangeRate(...exchangeRate, inputAmount);
     })
     .catch(err =>
@@ -128,10 +168,9 @@ function fetchCurrencyRate(url, query) {
       ),
     );
     // Get currency exchange rate when the user is offline
-    IndexedDatabase.getRates(query).then(data => {
-      if (typeof data === 'undefined') return;
-      calculateExchangeRate(data, inputAmount);
-    });
+    getRates(query);
+    //   calculateExchangeRate(...exchangeRate, inputAmount);
+
 }
 
 function calculateExchangeRate(exchangeRate, input) {
