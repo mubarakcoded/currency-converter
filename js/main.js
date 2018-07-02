@@ -89,7 +89,8 @@
      
 }
  //end of indexedDB section 
-
+  //create query variable at global scope
+  let query;
   window.addEventListener('load', function() {
     getData();
   });
