@@ -1,5 +1,8 @@
 
-var staticCacheName = 'currency-converter-v1';
+const staticCacheName = 'currency-converter-v1';
+var allCaches = [
+  staticCacheName
+];
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
@@ -8,7 +11,6 @@ self.addEventListener('install', function(event) {
         './',
         './index.html',
         './js/main.js',
-        './js/index.js',
         './css/style.css',
         './css/bootstrap.css'
       ]);
@@ -16,14 +18,16 @@ self.addEventListener('install', function(event) {
   );
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', function(event) {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then(function(cacheNames) {
       return Promise.all(
-        cacheNames.filter((cacheName) => {
-          return cacheName.startsWith('currency-converter-') &&
-            cacheName !== staticCacheName;
-        }).map(cacheName => caches.delete(cacheName))
+        cacheNames.filter(function(cacheName) {
+          return cacheName.startsWith('currency-') &&
+                 !allCaches.includes(cacheName);
+        }).map(function(cacheName) {
+          return caches.delete(cacheName);
+        })
       );
     })
   );
