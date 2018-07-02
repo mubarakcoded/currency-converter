@@ -1,37 +1,45 @@
-    /* 
-    body{
-        background-color: #9c9f84;
-        margin: 0px;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 14px;
-    }
-    #input{
-                background-image: none;
-                padding: .4em;
-                margin: .5em 0;
-                line-height: 1.4;
-                font-size: 16px;
-                display: block;
-                width: 100%;
-                outline: 0;
-            }
+  .converted{
+      font-size: 20px;
+      position: relative;
+      text-align: center;
+      width: 100%;
 
-        #void {
-                text-align: center;
-            }  */
-        
-html {
-    min-height: 100%;
+            }
+  .centered {
+    position: relative;
+    color:whitesmoke;
+    background-color:#008000 ;
+    height: 100vh;
+
+    /* bring your own prefixes */
   }
-  
-  body {
-    margin-bottom: 60px;
+  h3{
+      color: whitesmoke;
   }
-  
-  .footer {
-    position: fixed;
-    bottom: 0;
-    height: 60px;
-    line-height: 60px;
-    background-color: #f5f5f5;
+  .text-primary{
+      color: cornsilk;
   }
+  .void{
+      font-size: 40px;
+      position: relative;
+      text-align: center;
+      width: 100%;
+  }
+  #grad1 {
+    height: 200px;
+    background-color: #cccccc;
+    background-image: linear-gradient(red, yellow, green);
+}
+.button {
+    
+    border-radius: 3px;
+    position: relative;
+    font-size: 18px;
+    display: block;
+    box-sizing: border-box;
+
+}
+
+.button:hover {
+    background-color: #46a049;
+}
